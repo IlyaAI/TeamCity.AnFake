@@ -95,9 +95,12 @@ public final class AnFakeRunType extends RunType {
         sb.append("AnFake.exe ")
             .append(parameters.get("Script"))
             .append(' ')
-            .append(parameters.get("Targets"))
-            .append(' ')
-            .append(parameters.get("Properties"));
+            .append(parameters.get("Targets"));
+
+        String props = parameters.get("Properties");
+        if (!StringUtil.isEmptyOrSpaces(props)) {
+            sb.append(' ').append(props);
+        }
 
         return sb.toString();
     }
@@ -107,8 +110,8 @@ public final class AnFakeRunType extends RunType {
     public List<Requirement> getRunnerSpecificRequirements(@NotNull Map<String, String> parameters) {
         List<Requirement> spec = new ArrayList<>();
 
-        if ("checked".equals(parameters.get("Mono"))) {
-            spec.add(new Requirement("MonoVersion", "4.0", RequirementType.VER_NO_LESS_THAN));
+        if ("true".equals(parameters.get("Mono"))) {
+            spec.add(new Requirement("Mono", null, RequirementType.EXISTS));
         } else {
             spec.add(new Requirement("DotNetFramework4.0_x86", null, RequirementType.EXISTS));
         }
