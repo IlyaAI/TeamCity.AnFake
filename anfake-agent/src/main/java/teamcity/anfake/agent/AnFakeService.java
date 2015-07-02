@@ -67,7 +67,7 @@ public final class AnFakeService extends BuildServiceAdapter {
             if (start < 0 || end <= start + 7) {
                 throw new RunBuildException("Unable to extract AnFake path from anf.cmd");
             }
-            anFakePath = anFakePath.substring(start + 7, end + 11);
+            anFakePath = FileUtil.normalizeSeparator(anFakePath.substring(start + 7, end + 11));
         } catch (IOException e) {
             throw new RunBuildException("Unable to read anf.cmd", e);
         }
