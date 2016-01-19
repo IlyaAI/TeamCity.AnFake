@@ -4,6 +4,7 @@ import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.agent.runner.BuildServiceAdapter;
 import jetbrains.buildServer.agent.runner.ProgramCommandLine;
+import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,6 +40,39 @@ public final class AnFakeExecService extends BuildServiceAdapter {
         args.addAll(getProperties());
 
         return createProgramCommandline(executable, args);
+    }
+
+    private String getMonoJit() throws RunBuildException {
+        String monoJit = getConfigParameters().get("Mono");
+        if (monoJit == null) {
+            throw new RunBuildException("Unable to find config parameter Mono.");
+        }
+        return monoJit;
+    }
+
+    private String getAnFakeExe() throws RunBuildException {
+        File baseDir = new File(getWorkingDirectory(), getScript()).getParentFile();
+        File anfCmd = new File(baseDir, "anf.cmd");
+
+        if (!anfCmd.exists()) {
+            throw new RunBuildException(
+                String.format("anf.cmd not found: '%s'", anfCmd.getAbsolutePath()));
+        }
+
+        String anFakePath;
+        try {
+            anFakePath = FileUtil.readText(anfCmd);
+            int start = anFakePath.indexOf("\"%~dp0\\");
+            int end = anFakePath.indexOf("\\AnFake.exe\"");
+            if (start < 0 || end <= start + 7) {
+                throw new RunBuildException("Unable to extract AnFake path from anf.cmd");
+            }
+            anFakePath = FileUtil.normalizeSeparator(anFakePath.substring(start + 7, end + 11));
+        } catch (IOException e) {
+            throw new RunBuildException("Unable to read anf.cmd", e);
+        }
+
+        return new File(baseDir, anFakePath).getAbsolutePath();
     }
 
     private String getScript() throws RunBuildException {
