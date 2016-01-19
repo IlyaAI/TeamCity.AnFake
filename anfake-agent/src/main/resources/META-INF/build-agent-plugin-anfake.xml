@@ -4,6 +4,8 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd"
        default-autowire="constructor">
 
-  <bean class="teamcity.anfake.agent.AnFakeServiceFactory"/>
+  <bean class="teamcity.anfake.agent.AnFakeRestoreServiceFactory"/>
+  <bean class="teamcity.anfake.agent.AnFakeWorkspaceServiceFactory"/>
+  <bean class="teamcity.anfake.agent.AnFakeExecServiceFactory"/>
 
 </beans>
