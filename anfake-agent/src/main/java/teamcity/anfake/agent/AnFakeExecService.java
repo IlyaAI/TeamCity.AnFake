@@ -1,16 +1,15 @@
 package teamcity.anfake.agent;
 
 import jetbrains.buildServer.RunBuildException;
+import jetbrains.buildServer.agent.BuildFinishedStatus;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.agent.runner.BuildServiceAdapter;
 import jetbrains.buildServer.agent.runner.ProgramCommandLine;
 import jetbrains.buildServer.util.StringUtil;
+import jetbrains.buildServer.vcs.VcsRootEntry;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Executes 'AnFake &lt;target> &lt;properties>' command.
@@ -38,7 +37,36 @@ public final class AnFakeExecService extends BuildServiceAdapter {
         args.addAll(getTargets());
         args.addAll(getProperties());
 
+        List<VcsRootEntry> vcsRoots = getBuild().getVcsRootEntries();
+        if (!vcsRoots.isEmpty()) {
+            String tfsUri = vcsRoots.get(0).getProperties().get("tfs-url");
+            if (!StringUtil.isEmptyOrSpaces(tfsUri)) {
+                args.add("Tfs.Uri=" + tfsUri);
+            }
+        }
+
+        String serverUrl = getConfigParameters().get("teamcity.serverUrl");
+        if (!StringUtil.isEmptyOrSpaces(serverUrl)) {
+            args.add("TeamCity.Uri=" + serverUrl);
+            args.add("TeamCity.BuildId=" + getBuild().getBuildId());
+            args.add("TeamCity.BuildTypeId=" + getBuild().getBuildTypeExternalId());
+        }
+
         return createProgramCommandline(executable, args);
+    }
+
+    @NotNull
+    @Override
+    public BuildFinishedStatus getRunResult(int exitCode) {
+        switch (exitCode) {
+            case 0:
+            case 1:
+                return BuildFinishedStatus.FINISHED_SUCCESS;
+            case 2:
+                return BuildFinishedStatus.FINISHED_WITH_PROBLEMS;
+            default:
+                return super.getRunResult(exitCode);
+        }
     }
 
     private String getScript() throws RunBuildException {
@@ -50,9 +78,12 @@ public final class AnFakeExecService extends BuildServiceAdapter {
     }
 
     private Collection<String> getTargets() throws RunBuildException {
-        String targets = getRunnerParameters().get("Targets");
+        String targets = getConfigParameters().get("anfake.targets");
         if (StringUtil.isEmptyOrSpaces(targets)) {
-            throw new RunBuildException("Target not specified.");
+            targets = getRunnerParameters().get("Targets");
+            if (StringUtil.isEmptyOrSpaces(targets)) {
+                throw new RunBuildException("Target not specified.");
+            }
         }
         return StringUtil.splitHonorQuotes(targets);
     }
