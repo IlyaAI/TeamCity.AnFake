@@ -10,6 +10,7 @@ import jetbrains.buildServer.vcs.VcsRootEntry;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Executes 'AnFake &lt;target> &lt;properties>' command.
@@ -18,6 +19,9 @@ import java.util.*;
  */
 public final class AnFakeExecService extends BuildServiceAdapter {
     //private static final Logger Log = Logger.getInstance(AnFakeService.class.getName());
+
+    private static final Pattern RX_DOT_ARTIFACTS =
+        Pattern.compile("(?:^|[\\r\\n;,]+)[\\t\\s]*\\.artifacts[\\t\\s]*(?:[\\r\\n;,]+|$)");
 
     @NotNull
     @Override
@@ -85,6 +89,12 @@ public final class AnFakeExecService extends BuildServiceAdapter {
                 throw new RunBuildException("Target not specified.");
             }
         }
+
+        String artifactPaths = getBuild().getArtifactsPaths();
+        if (!StringUtil.isEmptyOrSpaces(artifactPaths) && RX_DOT_ARTIFACTS.matcher(artifactPaths).find()) {
+            targets += " Drop";
+        }
+
         return StringUtil.splitHonorQuotes(targets);
     }
 

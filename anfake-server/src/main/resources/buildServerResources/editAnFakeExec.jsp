@@ -25,7 +25,7 @@
 <tr>
   <th><label>Artifacts:</label></th>
   <td>
-    If you wish to expose artifacts produced by AnFake add '.artifacts' into your 'Artifact Paths' under build 'General Settings'.
+    If you wish to expose artifacts produced by AnFake add '.artifacts' into your 'Artifact Paths' under 'General Settings' of your build configuration.
   </td>
 </tr>
 
