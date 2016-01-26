@@ -16,9 +16,6 @@
         <fileSet>
             <directory>bin</directory>
             <outputDirectory>/anfake-agent</outputDirectory>
-            <includes>
-                <include>NuGet.exe</include>
-            </includes>
         </fileSet>
         <fileSet>
             <outputDirectory>/anfake-agent</outputDirectory>
