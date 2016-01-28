@@ -1,6 +1,9 @@
 package teamcity.anfake.agent;
 
+import jetbrains.buildServer.BuildProblemData;
+import jetbrains.buildServer.BuildProblemTypes;
 import jetbrains.buildServer.RunBuildException;
+import jetbrains.buildServer.agent.BuildFinishedStatus;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.agent.runner.BuildServiceAdapter;
 import jetbrains.buildServer.agent.runner.ProgramCommandLine;
@@ -44,6 +47,27 @@ public final class AnFakeRestoreService extends BuildServiceAdapter {
         args.addAll(getCustomArguments());
 
         return createProgramCommandline(executable, args);
+    }
+
+    @NotNull
+    @Override
+    public BuildFinishedStatus getRunResult(int exitCode) {
+        switch (exitCode) {
+            case 0:
+            case 1:
+                return BuildFinishedStatus.FINISHED_SUCCESS;
+            default:
+                BuildProblemData problemData = BuildProblemData.createBuildProblem(
+                    getRunnerContext().getRunType(),
+                    BuildProblemTypes.TC_EXIT_CODE_TYPE,
+                    "AnFake restore FAILED.");
+
+                getBuild()
+                    .getBuildLogger()
+                    .logBuildProblem(problemData);
+
+                return BuildFinishedStatus.FINISHED_WITH_PROBLEMS;
+        }
     }
 
     private String getNuGetExe() throws RunBuildException {
