@@ -100,9 +100,22 @@ public final class AnFakeExecService extends BuildServiceAdapter {
 
     private Collection<String> getProperties() throws RunBuildException {
         String props = getRunnerParameters().get("Properties");
+
+        List<String> propsList;
         if (StringUtil.isEmptyOrSpaces(props)) {
-            return Collections.emptyList();
+            propsList = new ArrayList<>();
+        } else {
+            propsList = StringUtil.splitHonorQuotes(props);
         }
-        return StringUtil.splitHonorQuotes(props);
+
+        for (Map.Entry<String, String> param: getConfigParameters().entrySet()) {
+            if (param.getKey().startsWith("anfake.prop.")) {
+                propsList.add(
+                    String.format("\"%s=%s\"", param.getKey().substring(12), param.getValue())
+                );
+            }
+        }
+
+        return propsList;
     }
 }
