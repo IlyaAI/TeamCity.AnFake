@@ -79,6 +79,7 @@ public final class AnFakeExecRunType extends RunType {
         map.put("Targets", "Build");
         map.put("Script", "build.fsx");
         map.put("Properties", "");
+        map.put("AnFakePath", "");
         map.put("Mono", "");
 
         return map;

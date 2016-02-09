@@ -3,6 +3,7 @@ package teamcity.anfake.agent;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.util.FileUtil;
+import jetbrains.buildServer.util.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,15 +12,21 @@ public final class AnFake {
     private AnFake() {}
 
     public static String getExe(BuildRunnerContext ctx) throws RunBuildException {
-        File baseDir = ctx.getWorkingDirectory();
-        File anfCmd = new File(baseDir, "anf.cmd");
+        String anFakePath = ctx.getRunnerParameters().get("AnFakePath");
+
+        File baseDir = !StringUtil.isEmptyOrSpaces(anFakePath)
+            ? new File(ctx.getWorkingDirectory(), anFakePath)
+            : ctx.getWorkingDirectory();
+
+        File anfCmd = !baseDir.isFile()
+            ? new File(baseDir, "anf.cmd")
+            : baseDir;
 
         if (!anfCmd.exists()) {
             throw new RunBuildException(
                 String.format("anf.cmd not found: '%s'", anfCmd.getAbsolutePath()));
         }
 
-        String anFakePath;
         try {
             anFakePath = FileUtil.readText(anfCmd);
             int start = anFakePath.indexOf("\"%~dp0\\");
@@ -32,6 +39,6 @@ public final class AnFake {
             throw new RunBuildException("Unable to read anf.cmd", e);
         }
 
-        return new File(baseDir, anFakePath).getAbsolutePath();
+        return new File(anfCmd.getParent(), anFakePath).getAbsolutePath();
     }
 }

@@ -75,7 +75,7 @@ public final class AnFakeRestoreRunType extends RunType {
         Map<String, String> map = new HashMap<String, String>();
         map.put("PackagesConfig", ".nuget/packages.config");
         map.put("SolutionDirectory", "");
-        map.put("SourceUrl", "https://www.nuget.org/api/v2/");
+        map.put("SourceUrl", "");
         map.put("Options", "");
 
         return map;

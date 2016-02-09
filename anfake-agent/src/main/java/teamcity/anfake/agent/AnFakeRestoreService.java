@@ -54,7 +54,6 @@ public final class AnFakeRestoreService extends BuildServiceAdapter {
     public BuildFinishedStatus getRunResult(int exitCode) {
         switch (exitCode) {
             case 0:
-            case 1:
                 return BuildFinishedStatus.FINISHED_SUCCESS;
             default:
                 BuildProblemData problemData = BuildProblemData.createBuildProblem(

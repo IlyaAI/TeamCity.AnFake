@@ -40,6 +40,15 @@
 </tr>
 
 <tr class="advancedSetting">
+  <th><label for="AnFakePath">AnFake working path:</label></th>
+  <td>
+    <props:textProperty name="AnFakePath" className="longField"/>
+    <bs:vcsTree fieldId="AnFakePath"/>
+    <span class="smallNote">Relative path to the anf.cmd</span>
+  </td>
+</tr>
+
+<tr class="advancedSetting">
   <th><label for="Mono">Run with Mono:</label></th>
   <td>
     <props:checkboxProperty name="Mono"/>
