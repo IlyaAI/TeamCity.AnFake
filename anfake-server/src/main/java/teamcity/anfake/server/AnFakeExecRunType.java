@@ -54,6 +54,9 @@ public final class AnFakeExecRunType extends RunType {
                 if (StringUtil.isEmptyOrSpaces(properties.get("Targets"))) {
                     errors.add(new InvalidProperty("Targets", "At least one target should be specified"));
                 }
+                if (StringUtil.isEmptyOrSpaces(properties.get("Wrapper"))) {
+                    errors.add(new InvalidProperty("Wrapper", "Wrapper batch file should be specified"));
+                }
                 if (StringUtil.isEmptyOrSpaces(properties.get("Script"))) {
                     errors.add(new InvalidProperty("Script", "Build script path should be specified"));
                 }
@@ -79,7 +82,7 @@ public final class AnFakeExecRunType extends RunType {
         map.put("Targets", "Build");
         map.put("Script", "build.fsx");
         map.put("Properties", "");
-        map.put("AnFakePath", "");
+        map.put("Wrapper", "anf.cmd");
         map.put("Mono", "");
 
         return map;

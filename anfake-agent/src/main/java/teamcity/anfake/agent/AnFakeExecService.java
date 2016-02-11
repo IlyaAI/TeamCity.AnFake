@@ -5,10 +5,12 @@ import jetbrains.buildServer.agent.BuildFinishedStatus;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.agent.runner.BuildServiceAdapter;
 import jetbrains.buildServer.agent.runner.ProgramCommandLine;
+import jetbrains.buildServer.agent.runner.SimpleProgramCommandLine;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.vcs.VcsRootEntry;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -26,18 +28,21 @@ public final class AnFakeExecService extends BuildServiceAdapter {
     @NotNull
     @Override
     public ProgramCommandLine makeProgramCommandLine() throws RunBuildException {
-        String executable;
+        File executable;
         List<String> args = new ArrayList<>();
 
         BuildRunnerContext ctx = getRunnerContext();
+        File anfWrapper = AnFake.getWrapper(ctx);
+        File anfExe = AnFake.getExe(anfWrapper);
+
         if (Mono.isEnabled(ctx)) {
             executable = Mono.getJit(ctx);
-            args.add(AnFake.getExe(ctx));
+            args.add(anfExe.getPath());
         } else {
-            executable = AnFake.getExe(ctx);
+            executable = anfExe;
         }
 
-        args.add(getScript());
+        args.add(new File(getWorkingDirectory(), getScript()).getPath());
         args.addAll(getTargets());
         args.addAll(getProperties());
 
@@ -54,9 +59,14 @@ public final class AnFakeExecService extends BuildServiceAdapter {
             args.add("TeamCity.Uri=" + serverUrl);
             args.add("TeamCity.BuildId=" + getBuild().getBuildId());
             args.add("TeamCity.BuildTypeId=" + getBuild().getBuildTypeExternalId());
+            args.add("TeamCity.CheckoutFolder=" + getCheckoutDirectory().getPath());
         }
 
-        return createProgramCommandline(executable, args);
+        return new SimpleProgramCommandLine(
+            ctx.getBuildParameters().getEnvironmentVariables(),
+            anfWrapper.getParent(),
+            executable.getPath(),
+            args);
     }
 
     @NotNull

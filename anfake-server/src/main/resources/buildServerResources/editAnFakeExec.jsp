@@ -30,21 +30,22 @@
 </tr>
 
 <tr class="advancedSetting">
-  <th><label for="Script">Build script path:</label></th>
+  <th><label for="Script">Build script:</label></th>
   <td>
     <props:textProperty name="Script" className="longField"/>
     <bs:vcsTree fieldId="Script"/>
-    <span class="smallNote">Relative path to the build script (build.fsx or build.csx)</span>
+    <span class="smallNote">Relative path to the build script (including file itself)</span>
     <span class="error" id="error_Script"></span>
   </td>
 </tr>
 
 <tr class="advancedSetting">
-  <th><label for="AnFakePath">AnFake working path:</label></th>
+  <th><label for="Wrapper">Wrapper (anf.cmd):</label></th>
   <td>
-    <props:textProperty name="AnFakePath" className="longField"/>
-    <bs:vcsTree fieldId="AnFakePath"/>
-    <span class="smallNote">Relative path to the anf.cmd</span>
+    <props:textProperty name="Wrapper" className="longField"/>
+    <bs:vcsTree fieldId="Wrapper"/>
+    <span class="smallNote">Relative path to the anf.cmd (including file itself)</span>
+    <span class="error" id="error_Wrapper"></span>
   </td>
 </tr>
 

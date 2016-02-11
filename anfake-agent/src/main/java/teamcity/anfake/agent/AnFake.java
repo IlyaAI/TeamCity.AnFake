@@ -11,24 +11,25 @@ import java.io.IOException;
 public final class AnFake {
     private AnFake() {}
 
-    public static String getExe(BuildRunnerContext ctx) throws RunBuildException {
-        String anFakePath = ctx.getRunnerParameters().get("AnFakePath");
+    public static File getWrapper(BuildRunnerContext ctx) throws RunBuildException {
+        String anfCmd = ctx.getRunnerParameters().get("Wrapper");
 
-        File baseDir = !StringUtil.isEmptyOrSpaces(anFakePath)
-            ? new File(ctx.getWorkingDirectory(), anFakePath)
-            : ctx.getWorkingDirectory();
+        if (StringUtil.isEmptyOrSpaces(anfCmd))
+            throw new RunBuildException("Wrapper batch file not specified.");
 
-        File anfCmd = !baseDir.isFile()
-            ? new File(baseDir, "anf.cmd")
-            : baseDir;
-
-        if (!anfCmd.exists()) {
+        File anfFile = new File(ctx.getWorkingDirectory(), anfCmd);
+        if (!anfFile.exists()) {
             throw new RunBuildException(
-                String.format("anf.cmd not found: '%s'", anfCmd.getAbsolutePath()));
+                String.format("Wrapper batch file not found: '%s'", anfFile.getAbsolutePath()));
         }
 
+        return anfFile;
+    }
+
+    public static File getExe(File wrapper) throws RunBuildException {
+        String anFakePath;
         try {
-            anFakePath = FileUtil.readText(anfCmd);
+            anFakePath = FileUtil.readText(wrapper);
             int start = anFakePath.indexOf("\"%~dp0\\");
             int end = anFakePath.indexOf("\\AnFake.exe\"");
             if (start < 0 || end <= start + 7) {
@@ -39,6 +40,10 @@ public final class AnFake {
             throw new RunBuildException("Unable to read anf.cmd", e);
         }
 
-        return new File(anfCmd.getParent(), anFakePath).getAbsolutePath();
+        return new File(wrapper.getParent(), anFakePath);
+    }
+
+    public static File getExe(BuildRunnerContext ctx) throws RunBuildException {
+        return getExe(getWrapper(ctx));
     }
 }

@@ -26,13 +26,13 @@ public final class AnFakeRestoreService extends BuildServiceAdapter {
     @NotNull
     @Override
     public ProgramCommandLine makeProgramCommandLine() throws RunBuildException {
-        String executable;
+        File executable;
         List<String> args = new ArrayList<String>();
 
         BuildRunnerContext ctx = getRunnerContext();
         if (Mono.isEnabled(ctx)) {
             executable = Mono.getJit(ctx);
-            args.add(getNuGetExe());
+            args.add(getNuGetExe().getPath());
         } else {
             executable = getNuGetExe();
         }
@@ -46,7 +46,7 @@ public final class AnFakeRestoreService extends BuildServiceAdapter {
         args.add("-NonInteractive");
         args.addAll(getCustomArguments());
 
-        return createProgramCommandline(executable, args);
+        return createProgramCommandline(executable.getPath(), args);
     }
 
     @NotNull
@@ -69,13 +69,13 @@ public final class AnFakeRestoreService extends BuildServiceAdapter {
         }
     }
 
-    private String getNuGetExe() throws RunBuildException {
+    private File getNuGetExe() throws RunBuildException {
         File nugetExe = FileUtil.getCanonicalFile(new File("../plugins/anfake-agent/NuGet.exe"));
         if (!nugetExe.exists()) {
             throw new RunBuildException(
                 String.format("NuGet not found. Search path: %s", nugetExe.getAbsolutePath()));
         }
-        return nugetExe.getAbsolutePath();
+        return nugetExe;
     }
 
     private String getPackagesConfig() throws RunBuildException {

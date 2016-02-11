@@ -1,7 +1,10 @@
 package teamcity.anfake.agent;
 
+import com.intellij.openapi.util.text.StringUtil;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.BuildRunnerContext;
+
+import java.io.File;
 
 public final class Mono {
     private Mono() {}
@@ -10,11 +13,11 @@ public final class Mono {
         return "true".equals(ctx.getRunnerParameters().get("Mono"));
     }
 
-    public static String getJit(BuildRunnerContext ctx) throws RunBuildException {
+    public static File getJit(BuildRunnerContext ctx) throws RunBuildException {
         String monoJit = ctx.getConfigParameters().get("Mono");
-        if (monoJit == null) {
+        if (StringUtil.isEmptyOrSpaces(monoJit)) {
             throw new RunBuildException("Unable to find config parameter Mono.");
         }
-        return monoJit;
+        return new File(monoJit);
     }
 }
