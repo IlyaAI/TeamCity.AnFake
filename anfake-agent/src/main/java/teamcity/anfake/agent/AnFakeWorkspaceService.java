@@ -10,6 +10,8 @@ import jetbrains.buildServer.agent.runner.BuildServiceAdapter;
 import jetbrains.buildServer.agent.runner.ProgramCommandLine;
 import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.StringUtil;
+import jetbrains.buildServer.vcs.CheckoutRules;
+import jetbrains.buildServer.vcs.IncludeRule;
 import jetbrains.buildServer.vcs.VcsRootEntry;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,6 +41,11 @@ public final class AnFakeWorkspaceService extends BuildServiceAdapter {
 
         if (StringUtil.isEmptyOrSpaces(tfsUri) || StringUtil.isEmptyOrSpaces(tfsPath)) {
             throw new RunBuildException("AnFake requires first VCS root to be TFS root.");
+        }
+
+        List<IncludeRule> rules = vcsEntry.getCheckoutRules().getIncludeRules();
+        if (!rules.isEmpty()) {
+            tfsPath += "/" + rules.get(0).getFrom();
         }
 
         String executable = getWorkspacerExe();
