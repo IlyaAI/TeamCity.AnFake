@@ -6,6 +6,7 @@ import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.agent.runner.BuildServiceAdapter;
 import jetbrains.buildServer.agent.runner.ProgramCommandLine;
 import jetbrains.buildServer.agent.runner.SimpleProgramCommandLine;
+import jetbrains.buildServer.messages.serviceMessages.PublishArtifacts;
 import jetbrains.buildServer.util.StringUtil;
 import jetbrains.buildServer.vcs.VcsRootEntry;
 import org.jetbrains.annotations.NotNull;
@@ -67,6 +68,17 @@ public final class AnFakeExecService extends BuildServiceAdapter {
             anfWrapper.getParent(),
             executable.getPath(),
             args);
+    }
+
+    @Override
+    public void afterProcessFinished() throws RunBuildException {
+        File workingDir = AnFake.getWrapper(getRunnerContext()).getParentFile();
+        File anfLog = new File(workingDir, "AnFake.log");
+        if (anfLog.exists()) {
+            getBuild().getBuildLogger().message(
+                new PublishArtifacts(String.format("%s=>.teamcity/logs", anfLog.getPath())).asString()
+            );
+        }
     }
 
     @NotNull
