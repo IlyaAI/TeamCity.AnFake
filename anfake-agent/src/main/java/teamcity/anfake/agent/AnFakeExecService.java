@@ -23,9 +23,6 @@ import java.util.regex.Pattern;
 public final class AnFakeExecService extends BuildServiceAdapter {
     //private static final Logger Log = Logger.getInstance(AnFakeService.class.getName());
 
-    private static final Pattern RX_DOT_ARTIFACTS =
-        Pattern.compile("(?:^|[\\r\\n;,]+)[\\t\\s]*\\.artifacts[\\t\\s]*(?:[\\r\\n;,]+|$)");
-
     @NotNull
     @Override
     public ProgramCommandLine makeProgramCommandLine() throws RunBuildException {
@@ -110,11 +107,6 @@ public final class AnFakeExecService extends BuildServiceAdapter {
             if (StringUtil.isEmptyOrSpaces(targets)) {
                 throw new RunBuildException("Target not specified.");
             }
-        }
-
-        String artifactPaths = getBuild().getArtifactsPaths();
-        if (!StringUtil.isEmptyOrSpaces(artifactPaths) && RX_DOT_ARTIFACTS.matcher(artifactPaths).find()) {
-            targets += " Drop";
         }
 
         return StringUtil.splitHonorQuotes(targets);
