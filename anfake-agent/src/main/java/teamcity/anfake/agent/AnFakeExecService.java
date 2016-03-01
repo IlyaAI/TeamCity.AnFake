@@ -46,11 +46,16 @@ public final class AnFakeExecService extends BuildServiceAdapter {
 
         List<VcsRootEntry> vcsRoots = getBuild().getVcsRootEntries();
         if (!vcsRoots.isEmpty()) {
-            String tfsUri = vcsRoots.get(0).getProperties().get("tfs-url");
+            VcsRootEntry vcsEntry = vcsRoots.get(0);
+            args.add("TeamCity.BuildVcsNumber=" + getBuild().getBuildCurrentVersion(vcsEntry.getVcsRoot()));
+
+            String tfsUri = vcsEntry.getProperties().get("tfs-url");
             if (!StringUtil.isEmptyOrSpaces(tfsUri)) {
                 args.add("Tfs.Uri=" + tfsUri);
             }
         }
+
+        args.add("TeamCity.BuildCounter=" + getConfigParameters().get("build.counter"));
 
         String serverUrl = getConfigParameters().get("teamcity.serverUrl");
         if (!StringUtil.isEmptyOrSpaces(serverUrl)) {
