@@ -56,6 +56,7 @@ public final class AnFakeExecService extends BuildServiceAdapter {
         }
 
         args.add("TeamCity.BuildCounter=" + getConfigParameters().get("build.counter"));
+        args.add("TeamCity.BuildNumber=" + getBuild().getBuildNumber());
 
         String serverUrl = getConfigParameters().get("teamcity.serverUrl");
         if (!StringUtil.isEmptyOrSpaces(serverUrl)) {
