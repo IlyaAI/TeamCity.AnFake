@@ -63,6 +63,8 @@ public final class AnFakeExecService extends BuildServiceAdapter {
             args.add("TeamCity.BuildId=" + getBuild().getBuildId());
             args.add("TeamCity.BuildTypeId=" + getBuild().getBuildTypeExternalId());
             args.add("TeamCity.CheckoutFolder=" + getCheckoutDirectory().getPath());
+            args.add("TeamCity.User=" + getBuild().getAccessUser());
+            args.add("TeamCity.Password=" + getBuild().getAccessCode());
         }
 
         return new SimpleProgramCommandLine(
